@@ -13,6 +13,7 @@ interface Task {
     title: string;
     description: string;
     status: 'pending' | 'in-progress' | 'completed';
+    isStarred?: boolean;
 }
 
 export default function DashboardPage() {
@@ -67,19 +68,19 @@ export default function DashboardPage() {
         }
     };
 
-    const handleUpdateTask = async (id: string, status: Task['status'], title?: string, description?: string) => {
+    const handleUpdateTask = async (id: string, status: Task['status'], title?: string, description?: string, isStarred?: boolean) => {
         // Optimistic Update
         const originalTasks = [...tasks];
 
-        setTasks(prevTasks => {
-            const updatedTasks = prevTasks.map(task =>
-                task._id === id
-                    ? { ...task, status, title: title ?? task.title, description: description ?? task.description }
-                    : task
+        setTasks(prev => {
+            const updatedTasks = prev.map(task =>
+                task._id === id ? { ...task, status, title: title || task.title, description: description || task.description, isStarred: isStarred !== undefined ? isStarred : task.isStarred } : task
             );
 
-            // Re-apply sort to keep UI consistent
+            // Re-apply sort: Starred first, then completed last
             return updatedTasks.sort((a, b) => {
+                if (a.isStarred && !b.isStarred) return -1;
+                if (!a.isStarred && b.isStarred) return 1;
                 if (a.status === 'completed' && b.status !== 'completed') return 1;
                 if (a.status !== 'completed' && b.status === 'completed') return -1;
                 return 0;
@@ -87,7 +88,7 @@ export default function DashboardPage() {
         });
 
         try {
-            await api.put(`/tasks/${id}`, { status, title, description });
+            await api.put(`/tasks/${id}`, { status, title, description, isStarred });
             // Background revalidation (optional, but good for consistency)
             // We skip fetchTasks() to avoid UI flicker, trusting our optimistic update.
         } catch (error) {

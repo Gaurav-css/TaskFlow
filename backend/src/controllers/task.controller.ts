@@ -27,7 +27,7 @@ export const getTasks = async (req: AuthRequest, res: Response) => {
             ];
         }
 
-        const tasks = await Task.find(query).sort({ createdAt: -1 });
+        const tasks = await Task.find(query).sort({ isStarred: -1, createdAt: -1 });
         res.json(tasks);
     } catch (error) {
         res.status(500).json({ message: (error as Error).message });
@@ -95,6 +95,9 @@ export const updateTask = async (req: AuthRequest, res: Response) => {
             task.title = req.body.title || task.title;
             task.description = req.body.description || task.description;
             task.status = req.body.status || task.status;
+            if (req.body.isStarred !== undefined) {
+                task.isStarred = req.body.isStarred;
+            }
 
             const updatedTask = await task.save();
             res.json(updatedTask);

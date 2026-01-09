@@ -9,11 +9,12 @@ interface Task {
     description: string;
     status: 'pending' | 'in-progress' | 'completed';
     createdAt?: string;
+    isStarred?: boolean;
 }
 
 interface TaskCardProps {
     task: Task;
-    onUpdate: (id: string, status: Task['status'], title?: string, description?: string) => void;
+    onUpdate: (id: string, status: Task['status'], title?: string, description?: string, isStarred?: boolean) => void;
     onDelete: (id: string) => void;
 }
 
@@ -70,20 +71,52 @@ export default function TaskCard({ task, onUpdate, onDelete }: TaskCardProps) {
         }
     };
 
-    const colors = statusColors[task.status];
+    const colors = task.isStarred ? {
+        border: 'border-red-600',
+        text: 'text-red-600',
+        bg: 'bg-red-600',
+        shadow: '#dc2626'
+    } : statusColors[task.status];
 
     const handleSave = () => {
         onUpdate(task._id, task.status, editTitle, editDesc);
         setIsEditing(false);
     };
 
+    const handleStarClick = () => {
+        const newStarredState = !task.isStarred;
+
+        if (newStarredState) {
+            // Heart animation
+            confetti({
+                particleCount: 30,
+                spread: 60,
+                origin: { x: 0.5, y: 0.5 },
+                colors: ['#ef4444', '#dc2626'],
+                shapes: ['circle'], // 'heart' shape requires shape: 'heart' which isn't standard in basic package without config object, but circle red works well or we try shape: 'star'
+                scalar: 1.2
+            });
+        }
+
+        onUpdate(task._id, task.status, task.title, task.description, newStarredState);
+    };
+
     return (
         <div
-            className={`group relative bg-[#FFFDF2] border-2 ${colors.border} p-6 transition-all md:hover:-translate-y-1 hover:z-10 z-0`}
+            className={`group relative bg-[#FFFDF2] border-2 ${colors.border} p-6 transition-all md:hover:-translate-y-1 hover:z-10 z-0 duration-300`}
             style={{
                 boxShadow: `8px 8px 0px 0px ${colors.shadow}`
             }}
         >
+            <button
+                onClick={handleStarClick}
+                className={`absolute -top-3 -right-3 w-8 h-8 flex items-center justify-center rounded-full border-2 border-black bg-[#FFFDF2] transition-transform hover:scale-110 z-20 ${task.isStarred ? 'scale-110' : 'opacity-0 group-hover:opacity-100'}`}
+                title={task.isStarred ? "Unmark Important" : "Mark as Important"}
+            >
+                <span className={`text-xl leading-none ${task.isStarred ? 'text-red-600' : 'text-gray-300 hover:text-red-400'}`}>
+                    ★
+                </span>
+            </button>
 
             {!isEditing && (
                 <>

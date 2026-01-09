@@ -7,6 +7,7 @@ export interface ITask extends Document {
     user: mongoose.Schema.Types.ObjectId;
     isDeleted: boolean;
     deletedAt?: Date;
+    isStarred: boolean;
 }
 
 const TaskSchema: Schema = new Schema({
@@ -35,6 +36,10 @@ const TaskSchema: Schema = new Schema({
     deletedAt: {
         type: Date,
         default: null,
+    },
+    isStarred: {
+        type: Boolean,
+        default: false,
     },
 }, {
     timestamps: true,
