@@ -36,6 +36,9 @@ export default function Navbar() {
 
                         {user ? (
                             <div className="flex items-center space-x-6">
+                                <Link href="/history" className="text-black uppercase text-xs font-bold tracking-widest hover:underline">
+                                    History
+                                </Link>
                                 <span className="hidden md:block text-black text-xs font-bold uppercase tracking-wider">
                                     {user.email}
                                 </span>

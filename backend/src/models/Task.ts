@@ -5,6 +5,8 @@ export interface ITask extends Document {
     description: string;
     status: 'pending' | 'in-progress' | 'completed';
     user: mongoose.Schema.Types.ObjectId;
+    isDeleted: boolean;
+    deletedAt?: Date;
 }
 
 const TaskSchema: Schema = new Schema({
@@ -25,6 +27,14 @@ const TaskSchema: Schema = new Schema({
         type: mongoose.Schema.Types.ObjectId,
         ref: 'User',
         required: true,
+    },
+    isDeleted: {
+        type: Boolean,
+        default: false,
+    },
+    deletedAt: {
+        type: Date,
+        default: null,
     },
 }, {
     timestamps: true,
