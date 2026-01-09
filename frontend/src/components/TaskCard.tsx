@@ -8,6 +8,7 @@ interface Task {
     title: string;
     description: string;
     status: 'pending' | 'in-progress' | 'completed';
+    createdAt?: string;
 }
 
 interface TaskCardProps {
@@ -87,9 +88,23 @@ export default function TaskCard({ task, onUpdate, onDelete }: TaskCardProps) {
             {!isEditing && (
                 <>
                     <div className="flex justify-between items-start mb-4">
-                        <h3 className="text-lg font-bold text-black font-serif line-clamp-1 pr-4 uppercase tracking-wide">
-                            {task.title}
-                        </h3>
+                        <div className="flex-1 pr-4">
+                            {task.createdAt && (
+                                <p className="text-[10px] text-gray-400 font-bold uppercase tracking-widest mb-1">
+                                    {new Date(task.createdAt).toLocaleString('en-US', {
+                                        weekday: 'short',
+                                        month: 'short',
+                                        day: 'numeric',
+                                        hour: 'numeric',
+                                        minute: 'numeric',
+                                        hour12: true
+                                    })}
+                                </p>
+                            )}
+                            <h3 className="text-lg font-bold text-black font-serif line-clamp-1 uppercase tracking-wide">
+                                {task.title}
+                            </h3>
+                        </div>
                         <span className={`px-3 py-1 text-[10px] uppercase tracking-widest font-bold border ${colors.border} ${colors.bg} text-white`}>
                             {task.status === 'in-progress' ? 'ACTIVE' : task.status}
                         </span>
